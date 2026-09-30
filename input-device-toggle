@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+SOCKET="/run/input-device-toggle.sock"
+
+case "$1" in
+    on|off|toggle)
+        echo "$1 $2" | nc -U "$SOCKET"
+        ;;
+    list)
+        for d in /sys/class/input/input*/name; do
+            echo "$(basename "$(dirname "$d")"): $(cat "$d")"
+        done
+        ;;
+    *)
+        echo "Usage: input-device-toggle {on|off|toggle|list} [input*]"
+        ;;
+esac

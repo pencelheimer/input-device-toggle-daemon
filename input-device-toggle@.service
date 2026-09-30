@@ -1,0 +1,9 @@
+[Unit]
+Description=Input Device Toggle Service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/input-device-toggle-worker
+StandardInput=socket
+StandardOutput=socket
+StandardError=socket

@@ -1,0 +1,10 @@
+[Unit]
+Description=Input Device Toggle Socket
+
+[Socket]
+ListenStream=/run/input-device-toggle.sock
+SocketMode=0666
+Accept=yes
+
+[Install]
+WantedBy=sockets.target
