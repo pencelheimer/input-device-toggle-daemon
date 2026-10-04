@@ -1,6 +1,6 @@
 # Maintainer: pencelheimer
 pkgname=input-device-toggle-daemon
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 pkgdesc="Systemd socket-activated daemon for toggling input devices"
 arch=('any')

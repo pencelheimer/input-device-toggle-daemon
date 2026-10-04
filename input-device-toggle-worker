@@ -2,28 +2,41 @@
 set -e
 
 read -r ACTION DEVICE || true
-SYSFS="/sys/class/input/${DEVICE}/inhibited"
 
-if [ ! -f "$SYSFS" ]; then
+TARGETS=()
+if [ -f "/sys/class/input/${DEVICE}/inhibited" ]; then
+    TARGETS+=("/sys/class/input/${DEVICE}/inhibited")
+else
+    shopt -s nocasematch
+    for d in /sys/class/input/input*/name; do
+        [[ "$(cat "$d" 2>/dev/null)" == *"$DEVICE"* ]] && TARGETS+=("$(dirname "$d")/inhibited")
+    done
+    shopt -u nocasematch
+fi
+
+if [ -z "$DEVICE" ] || [ ${#TARGETS[@]} -eq 0 ]; then
     echo "Error: Device '${DEVICE}' not found"
     exit 1
 fi
 
-case "$ACTION" in
-    on)
-        echo 0 > "$SYSFS"
-        echo "Activated ${DEVICE}"
-        ;;
-    off)
-        echo 1 > "$SYSFS"
-        echo "Deactivated ${DEVICE}"
-        ;;
-    toggle)
-        [ "$(cat "$SYSFS")" = "0" ] && echo 1 > "$SYSFS" || echo 0 > "$SYSFS"
-        echo "Toggled ${DEVICE}"
-        ;;
-    *)
-        echo "Usage: <on|off|toggle> [input*]"
-        exit 1
-        ;;
-esac
+for SYSFS in "${TARGETS[@]}"; do
+    DEV=$(basename "$(dirname "$SYSFS")")
+    case "$ACTION" in
+        on)
+            echo 0 > "$SYSFS"
+            echo "Activated ${DEV}"
+            ;;
+        off)
+            echo 1 > "$SYSFS"
+            echo "Deactivated ${DEV}"
+            ;;
+        toggle)
+            [ "$(cat "$SYSFS")" = "0" ] && echo 1 > "$SYSFS" || echo 0 > "$SYSFS"
+            echo "Toggled ${DEV}"
+            ;;
+        *)
+            echo "Usage: <on|off|toggle> [input*|name]"
+            exit 1
+            ;;
+    esac
+done

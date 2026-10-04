@@ -3,7 +3,7 @@ SOCKET="/run/input-device-toggle.sock"
 
 case "$1" in
     on|off|toggle)
-        echo "$1 $2" | nc -U "$SOCKET"
+        echo "$1 ${*:2}" | nc -U "$SOCKET"
         ;;
     list)
         for d in /sys/class/input/input*/name; do
@@ -11,6 +11,6 @@ case "$1" in
         done
         ;;
     *)
-        echo "Usage: input-device-toggle {on|off|toggle|list} [input*]"
+        echo "Usage: input-device-toggle {on|off|toggle|list} [input*|name]"
         ;;
 esac
